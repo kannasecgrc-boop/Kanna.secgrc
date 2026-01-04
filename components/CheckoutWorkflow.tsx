@@ -27,8 +27,6 @@ const CheckoutWorkflow: React.FC<CheckoutWorkflowProps> = ({ items, subtotal, de
     paymentMethod: 'UPI'
   });
 
-  const [upiVerified, setUpiVerified] = useState(false);
-
   // Dynamic Shipping Logic
   const isFreeDelivery = subtotal >= freeDeliveryThreshold;
   const finalShippingFee = isFreeDelivery ? 0 : deliveryFee;
@@ -43,7 +41,7 @@ const CheckoutWorkflow: React.FC<CheckoutWorkflowProps> = ({ items, subtotal, de
     const orderId = `ORD-${Date.now().toString().slice(-6)}`;
     
     // Simulating Gateway
-    await sendSMS(details.zip || 'Customer', `Order ${orderId} received at Sri Maheswara Node. Total: ₹${totalPayable}.`);
+    await sendSMS(details.zip || 'Customer', `Order ${orderId} received at Mana Kitchen. Total: ₹${totalPayable}.`);
     await sendWhatsApp('Customer', `Order ${orderId} confirmed! Kitchen is prepping.`);
     
     setTimeout(() => {
@@ -58,7 +56,7 @@ const CheckoutWorkflow: React.FC<CheckoutWorkflowProps> = ({ items, subtotal, de
         <div className="fixed inset-0 z-[200] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-10 text-center">
            <div className="w-20 h-20 border-4 border-gray-100 border-t-brand rounded-full animate-spin mb-8" />
            <h3 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">Kitchen Transmitting...</h3>
-           <p className="text-gray-400 mt-4 font-black uppercase tracking-widest text-[10px]">Verified by Sri Maheswara Merchant Node</p>
+           <p className="text-gray-400 mt-4 font-black uppercase tracking-widest text-[10px]">Verified by Merchant Node</p>
         </div>
       )}
 
@@ -106,7 +104,7 @@ const CheckoutWorkflow: React.FC<CheckoutWorkflowProps> = ({ items, subtotal, de
                 {['UPI', 'COD'].map((method) => (
                   <button 
                     key={method}
-                    onClick={() => { setDetails({...details, paymentMethod: method as any}); setUpiVerified(false); }}
+                    onClick={() => { setDetails({...details, paymentMethod: method as any}); }}
                     className={`flex items-center justify-between p-6 rounded-[32px] border-2 transition-all ${details.paymentMethod === method ? 'border-brand bg-brand/5' : 'border-gray-100 bg-white'}`}
                   >
                     <span className="font-black text-gray-900 uppercase tracking-tight">{method === 'UPI' ? 'PhonePe Merchant (UPI)' : 'Cash on Delivery'}</span>
@@ -117,35 +115,16 @@ const CheckoutWorkflow: React.FC<CheckoutWorkflowProps> = ({ items, subtotal, de
 
               {details.paymentMethod === 'UPI' && (
                 <div className="p-8 bg-white border-2 border-gray-100 rounded-[50px] text-center shadow-lg animate-in zoom-in-95">
-                   <div className="mb-6 flex flex-col items-center">
-                      <div className="bg-[#6739b7] text-white px-6 py-2 rounded-xl mb-3 shadow-lg font-black uppercase text-[10px] tracking-widest">PhonePe Merchant</div>
-                      <div className="bg-orange-500 text-white py-2 px-8 rounded-full font-black text-xs uppercase tracking-widest shadow-md">Sri Maheswara...</div>
-                   </div>
-                   
-                   <div className="w-48 h-48 bg-white rounded-[40px] mx-auto mb-6 flex flex-col items-center justify-center border-4 border-dashed border-gray-100 relative cursor-pointer group hover:border-brand transition-all" onClick={() => setUpiVerified(true)}>
-                      <svg className={`w-32 h-32 transition-all duration-500 ${upiVerified ? 'text-green-500 scale-75 opacity-10' : 'text-gray-900'}`} viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2zm-3 0h2v2h-2v-2zM13 13h2v2h-2v-2zm0 3h2v2h-2v-2zm0 3h2v2h-2v-2z"/>
-                      </svg>
-                      {upiVerified ? (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white/50 rounded-[36px]">
-                           <div className="bg-green-500 text-white p-4 rounded-full shadow-2xl scale-125">
-                              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeWidth="4" /></svg>
-                           </div>
-                        </div>
-                      ) : (
-                        <p className="absolute bottom-4 text-[8px] font-black text-gray-400 uppercase tracking-widest">Tap to Scan</p>
-                      )}
-                   </div>
-                   <div className="bg-gray-50 py-3 px-6 rounded-2xl inline-block border border-gray-100">
-                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Terminal ID</p>
-                      <p className="text-xs font-black text-gray-900">Terminal 6 — Q286096843</p>
+                   <div className="flex flex-col items-center justify-center space-y-4">
+                      <div className="bg-[#6739b7] text-white px-6 py-2 rounded-xl shadow-lg font-black uppercase text-[10px] tracking-widest">PhonePe Merchant</div>
+                      <p className="text-gray-500 font-bold text-sm max-w-xs">Proceed to pay securely via any UPI app. You will receive a payment link or request on your number.</p>
                    </div>
                 </div>
               )}
 
               <div className="flex gap-4 pt-4">
                  <button onClick={() => setStep(1)} className="flex-1 py-5 border-2 border-gray-100 rounded-[24px] font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all">Go Back</button>
-                 <button disabled={details.paymentMethod === 'UPI' && !upiVerified} onClick={() => setStep(3)} className="flex-[2] py-5 bg-gray-900 text-white rounded-[24px] font-black text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-20 hover:bg-brand transition-colors">Enter Address & Confirm</button>
+                 <button onClick={() => setStep(3)} className="flex-[2] py-5 bg-gray-900 text-white rounded-[24px] font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-brand transition-colors">Enter Address & Confirm</button>
               </div>
             </div>
           )}
@@ -213,3 +192,4 @@ const CheckoutWorkflow: React.FC<CheckoutWorkflowProps> = ({ items, subtotal, de
 };
 
 export default CheckoutWorkflow;
+    
